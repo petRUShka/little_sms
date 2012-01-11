@@ -6,12 +6,12 @@ This gem provides access to LittleSMS.ru API from ruby (mri 1.8.7 and 1.9.2 supp
 
 # Usage
     require "little_sms"
-    api = LittleSMS.new(:apiuser, :apikey)
+    api = LittleSMS.new(:apiuser, :apikey, :sender)
     api.message.send(:recipients => "+79211234567", :message => "Test", :test => 1)
 
 Also you can pass a block to LittleSMS object:
 
-    LittleSMS.new(:apiuser, :apikey) do
+    LittleSMS.new(:apiuser, :apikey, :sender) do
       msg =  message.send(:recipients => "+79211234567", :message => "Test")
       if msg.success?
         messages_id = msg.messages_id.join
