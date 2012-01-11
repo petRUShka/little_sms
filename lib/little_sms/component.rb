@@ -11,9 +11,9 @@ class LittleSMS
     undef :send
     attr_reader :component
 
-    def initialize(component, api_user, api_key)
+    def initialize(component, api_user, api_key, sender)
       @api_uri = URI.parse("https://littlesms.ru:443/api/")
-      @api_user, @api_key = api_user, api_key
+      @api_user, @api_key, @sender = api_user, api_key, sender
       @component = component # Component name. E.g. message or user.
     end
 
@@ -23,8 +23,9 @@ class LittleSMS
 
     private
     def request_api_method(method, options = {})
-      options[:sign] = sign_request(options || {})
-      options[:user] = @api_user
+      options[:sender]  = @sender
+      options[:sign]    = sign_request(options || {})
+      options[:user]    = @api_user
 
       uri = @api_uri.merge("#{@component}/#{method}")
       req = Net::HTTP::Post.new(uri.path)
