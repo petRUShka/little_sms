@@ -3,6 +3,8 @@ require "net/http"
 require "net/https"
 require "digest/md5"
 require "digest/sha1"
+require "openssl"
+
 require_relative "responce"
 
 class LittleSMS
@@ -11,9 +13,9 @@ class LittleSMS
     undef :send
     attr_reader :component
 
-    def initialize(component, api_user, api_key, sender)
+    def initialize(component, api_user, api_key, sender, cert_file = nil)
       @api_uri = URI.parse("https://littlesms.ru:443/api/")
-      @api_user, @api_key, @sender = api_user, api_key, sender
+      @api_user, @api_key, @sender, @cert_file = api_user, api_key, sender, cert_file
       @component = component # Component name. E.g. message or user.
     end
 
@@ -38,6 +40,10 @@ class LittleSMS
       end
       res = Net::HTTP.new(uri.host, uri.port)
       res.use_ssl = use_ssl
+      if @cert_file
+        res.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        res.ca_file = @cert_file
+      end
 
       case res = res.start {|http| http.request(req) }
       when Net::HTTPSuccess, Net::HTTPRedirection
